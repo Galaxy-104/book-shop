@@ -26,7 +26,7 @@ const join = (req, res) => {
 const login = (req, res) => {
     const { email, password } = req.body;
 
-    let sql = 'SELECT * FROM users WHERE = ?'
+    let sql = 'SELECT * FROM users WHERE = ?';
     conn.query(sql, email,
         (err, results) => {
             if (err) {
@@ -65,11 +65,49 @@ const login = (req, res) => {
 };
 
 const passwordResetRequest = (req, res) => {
-    res.json('비밀번호 초기화 요청');
+    const { email } = req.body;
+
+    let sql = 'SELECT * FROM users WHERE = ?';
+    conn.query(sql, email,
+        (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(StatusCodes.BAD_REQUEST).end(); // BAD REQUEST
+            }
+
+            // 이메일로 유저가 있는지 찾기
+            const user = results[0];
+            if (user) {
+                return res.status(StatusCodes.OK).json({
+                    email
+                });
+            } else {
+                return res.status(StatusCodes.UNAUTHORIZED).end();
+            }
+        }
+    )
 };
 
 const passwordReset = (req, res) => {
-    res.json('비밀번호 초기화')
+    const { email, password } = req.body;
+
+    let sql = `UPDATE users SET password = ? WHERE email = ?`;
+    let values = [ password, email ];
+    conn.query(sql, values, 
+        (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(StatusCodes.BAD_REQUEST).end();
+            }
+
+            if (results.affectedRows == 0) {
+                return res.status(StatusCodes.BAD_REQUEST).end();
+            } else {
+                return res.status(StatusCodes.OK).json(results);
+            }
+        }
+    )
+
 };
 
 module.exports = {
