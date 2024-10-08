@@ -1,5 +1,5 @@
 const express = require('express');
-const router = expressRouter();
+const router = express.Router();
 const { 
     allBooks, 
     bookDetail
