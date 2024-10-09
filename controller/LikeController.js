@@ -22,7 +22,23 @@ const addLike = (req, res) => {
 }
 
 const cancelLike = (req, res) => {
-    res.json({ message : "좋아요 취소"})
+    //DELETE FROM likes WHERE user_id = 1 AND liked_book_id = 3;
+    const { id } = req.params;
+    const { user_id } = req.body;
+    
+    let sql = `DELETE FROM likes WHERE user_id = ? AND liked_book_id = ?`;
+    const values = [ user_id, id ];
+    conn.query(sql, values,
+        (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end(); // BAD REQUEST
+        }
+
+        return res.status(StatusCodes.OK).json(results);
+
+    })
+
 }
 
 module.exports = {
